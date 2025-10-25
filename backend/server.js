@@ -8,7 +8,9 @@ const mongoose = require('mongoose');
 const authRoutes = require('./routes/auth.routes'); 
 const templateRoutes = require('./routes/template.routes');
 const submissionRoutes = require('./routes/submission.routes'); // <-- ADD THIS LINE
-
+const uploadsRouter = require('./routes/upload.routes');
+const reportsRouter = require('./routes/report.routes');
+const exportsRouter = require('./routes/export.routes');
 // 2. Load environment variables from .env file
 dotenv.config();
 
@@ -37,11 +39,27 @@ app.use('/api/auth', authRoutes);
 app.use('/api/templates', templateRoutes); 
 // All submission routes will be prefixed with /api/submissions
 app.use('/api/submissions', submissionRoutes); // <-- ADD THIS LINE
+app.use('/api/uploads', uploadsRouter);
+app.use('/api/reports', reportsRouter);
+app.use('/api/reports', exportsRouter);
 
-// 5. Create a simple test route
-app.get('/', (req, res) => {
-  res.send('Backend API is running!');
+app.use((err, req, res, next) => {
+  // Multer fileFilter will call next(err)
+  if (err.message && err.message.includes('Unsupported file type')) {
+    return res.status(400).json({ message: err.message });
+  }
+  if (err.code === 'LIMIT_FILE_SIZE') {
+    return res.status(400).json({ message: 'File too large. Max 5MB.' });
+  }
+  console.error('Unhandled error:', err);
+  res.status(500).json({ message: 'Internal server error', error: err.message });
 });
+
+
+// // 5. Create a simple test route
+// app.get('/', (req, res) => {
+//   res.send('Backend API is running!');
+// });
 
 // 6. Start the server
 app.listen(PORT, () => {
