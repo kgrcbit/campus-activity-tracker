@@ -1,7 +1,15 @@
-const ActivityTemplate = require('../models/ActivityTemplate'); 
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+// Make sure this path is correct for your activityTemplate.model.js file
+
+// ... other imports
+const ActivityTemplate = require('../models/activityTemplate.model');
+
+// ... rest of the file
+// Load .env variables
+dotenv.config();
 
 // NOTE: This array contains the data structure definitions for 20 activity templates.
-
 const templateData = [
     // --- TECHNICAL CATEGORY (7) ---
     {
@@ -86,7 +94,6 @@ const templateData = [
             { fieldId: "proof_upload", label: "Certificate of Completion", type: "file", required: true },
         ]
     },
-
     // --- CULTURAL CATEGORY (5) ---
     {
         templateName: "Cultural_Festival_Participation",
@@ -144,7 +151,6 @@ const templateData = [
             { fieldId: "proof_upload", label: "Completion Certificate", type: "file", required: true },
         ]
     },
-
     // --- SPORTS CATEGORY (4) ---
     {
         templateName: "Inter_College_Sports",
@@ -189,7 +195,6 @@ const templateData = [
             { fieldId: "proof_upload", label: "Appointment/Appreciation Letter", type: "file", required: true },
         ]
     },
-
     // --- PROFESSIONAL DEVELOPMENT CATEGORY (4) ---
     {
         templateName: "Industry_Internship",
@@ -236,7 +241,6 @@ const templateData = [
             { fieldId: "proof_upload", label: "Offer Letter PDF", type: "file", required: true },
         ]
     },
-
     // --- COMMUNITY & GENERAL (4) ---
     {
         templateName: "Social_Outreach_Program",
@@ -283,16 +287,31 @@ const templateData = [
     },
 ];
 
-// Helper function that Naveen can use to insert all templates (for completeness)
-async function seedTemplates() {
-    try {
-        // This is where Naveen would implement the DB connection and insertion logic.
-        // For your file, this data array is the deliverable.
-        console.log(`Template data array successfully defined with ${templateData.length} templates.`);
-        return templateData;
-    } catch (error) {
-        console.error("Error during template definition:", error);
-    }
-}
+// --- SCRIPT TO RUN THE SEEDING ---
+const seedDB = async () => {
+  try {
+    // 1. Connect to the database
+    await mongoose.connect(process.env.MONGO_DB_URI);
+    console.log('MongoDB connected for seeding...');
 
-// module.exports = templateData;
+    // 2. Clear out any old templates
+    await ActivityTemplate.deleteMany({});
+    console.log('Old templates deleted.');
+
+    // 3. Insert the new templates
+    await ActivityTemplate.insertMany(templateData);
+    console.log(`${templateData.length} templates have been added!`);
+
+    // 4. Disconnect
+    await mongoose.disconnect();
+    console.log('MongoDB disconnected.');
+
+  } catch (error) {
+    console.error('Error seeding database:', error);
+    await mongoose.disconnect();
+    process.exit(1);
+  }
+};
+
+// Run the function
+seedDB();

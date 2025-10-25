@@ -6,7 +6,8 @@ const mongoose = require('mongoose');
 
 // --- IMPORT YOUR ROUTES ---
 const authRoutes = require('./routes/auth.routes'); 
-const templateRoutes = require('./routes/template.routes'); // <-- ADD THIS LINE
+const templateRoutes = require('./routes/template.routes');
+const submissionRoutes = require('./routes/submission.routes'); // <-- ADD THIS LINE
 
 // 2. Load environment variables from .env file
 dotenv.config();
@@ -32,7 +33,10 @@ mongoose.connect(process.env.MONGO_DB_URI)
 // --- USE YOUR ROUTES ---
 // All auth routes will be prefixed with /api/auth
 app.use('/api/auth', authRoutes); 
-app.use('/api/templates', templateRoutes); // <-- ADD THIS LINE
+// All template routes will be prefixed with /api/templates
+app.use('/api/templates', templateRoutes); 
+// All submission routes will be prefixed with /api/submissions
+app.use('/api/submissions', submissionRoutes); // <-- ADD THIS LINE
 
 // 5. Create a simple test route
 app.get('/', (req, res) => {
