@@ -2,7 +2,11 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const mongoose = require('mongoose'); // Import Mongoose
+const mongoose = require('mongoose');
+
+// --- IMPORT YOUR ROUTES ---
+const authRoutes = require('./routes/auth.routes'); 
+const templateRoutes = require('./routes/template.routes'); // <-- ADD THIS LINE
 
 // 2. Load environment variables from .env file
 dotenv.config();
@@ -15,7 +19,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors()); // Allows your frontend to talk to this backend
 app.use(express.json()); // Allows your server to read JSON data from requests
 
-// --- NEW: CONNECT TO MONGODB ---
+// --- CONNECT TO MONGODB ---
 mongoose.connect(process.env.MONGO_DB_URI)
   .then(() => {
     console.log('Connected to MongoDB successfully!');
@@ -25,10 +29,15 @@ mongoose.connect(process.env.MONGO_DB_URI)
   });
 // ------------------------------
 
-// // 5. Create a simple test route
-// app.get('/', (req, res) => {
-//   res.send('Backend API is running!');
-// });
+// --- USE YOUR ROUTES ---
+// All auth routes will be prefixed with /api/auth
+app.use('/api/auth', authRoutes); 
+app.use('/api/templates', templateRoutes); // <-- ADD THIS LINE
+
+// 5. Create a simple test route
+app.get('/', (req, res) => {
+  res.send('Backend API is running!');
+});
 
 // 6. Start the server
 app.listen(PORT, () => {
