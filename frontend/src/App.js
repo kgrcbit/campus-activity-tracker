@@ -4,6 +4,7 @@ import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ActivityViewPage from './pages/ActivityViewPage';
+import ActivityAddPage from './pages/ActivityAddPage';
 import PrivateRoute from './components/common/PrivateRoute'; 
 
 const App = () => (
@@ -22,6 +23,7 @@ const App = () => (
         <Route path="/admin/reports" element={<div>Admin Reports (Placeholder)</div>} />     {/* cite: 13 */}
       </Route>
       {/* Add a route for Rahul's Activity Submission: /activity/add */}
+      <Route path="/activity/add" element={<ActivityAddPage />} />
     </Routes>
   </Router>
 );
