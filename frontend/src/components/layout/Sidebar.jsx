@@ -10,7 +10,7 @@ import useAuthStore from '../../stores/authStore';
 const drawerWidth = 240;
 
 const Sidebar = () => {
-  const {  } = useAuthStore();
+  const { } = useAuthStore();
   const location = useLocation();
 
   const navItems = [
@@ -35,7 +35,7 @@ const Sidebar = () => {
     >
       <Toolbar>
         <Typography variant="h6" color="secondary" sx={{ fontWeight: 700 }}>
-          EAD Tracker
+          Campus Tracker
         </Typography>
       </Toolbar>
       <Box sx={{ overflow: 'auto' }}>

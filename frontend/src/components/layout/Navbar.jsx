@@ -26,7 +26,7 @@ const Navbar = ({ toggleSidebar }) => { // Assume a prop to toggle the sidebar
           <MenuIcon />
         </IconButton>
         <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-          EAD Activity Tracker
+        Campus Activity Tracker
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
           <Typography variant="subtitle1" color="inherit">

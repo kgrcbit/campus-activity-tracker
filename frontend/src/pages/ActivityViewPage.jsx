@@ -3,37 +3,15 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { 
   Box, Typography, Grid, CircularProgress, Alert, Button, Divider, List, ListItem, ListItemIcon, ListItemText 
 } from '@mui/material';
-import CustomCard from '../components/ui/CustomCard'; // Your reusable card component
-//import { API } from '../stores/authStore'; // Your configured Axios instance
+import { API } from '../stores/authStore'; 
+import CustomCard from '../components/ui/CustomCard'; 
+
+// Icon imports remain the same
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import WorkOutlineIcon from '@mui/icons-material/WorkOutline';
 import AttachFileIcon from '@mui/icons-material/AttachFile';
 import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
-
-// --- MOCK DATA STRUCTURE ---
-// Note: In a real app, this data comes from Naveen's GET /api/submissions/:id
-const mockActivityData = {
-    id: 1,
-    userId: 101,
-    templateId: 'HACKATHON_P',
-    templateName: 'Major Hackathon Participation',
-    status: 'Approved',
-    submittedAt: '2025-10-15T10:00:00Z',
-    // 'data' holds the fields submitted by Rahul's Dynamic Form
-    data: {
-        field_title: 'Global Code Sprint 2025',
-        field_date: '2025-09-28',
-        field_team_size: 4,
-        field_summary: 'Developed an AI-powered academic planner.',
-    },
-    // 'proofs' array contains URLs returned from Shravan's File Upload API
-    proofs: [
-        { url: 'http://cloudinary.com/proof1.jpg', filename: 'certificate_hackathon.jpg', fileType: 'image/jpeg' }, // cite: 99
-        { url: 'http://cloudinary.com/proof2.pdf', filename: 'team_photo.pdf', fileType: 'application/pdf' }, // cite: 99
-    ],
-};
-// --- END MOCK DATA ---
 
 const StatusBadge = ({ status }) => {
     let color, icon;
@@ -61,7 +39,7 @@ const StatusBadge = ({ status }) => {
 };
 
 const ActivityViewPage = () => {
-    const { id } = useParams(); // Get the submission ID from the URL: /activity/view/:id
+    const { id } = useParams();
     const navigate = useNavigate();
     const [submission, setSubmission] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -75,19 +53,15 @@ const ActivityViewPage = () => {
         setLoading(true);
         setError(null);
         try {
-            // Calls Naveen's API: GET /api/submissions/:id
-            // const response = await API.get(`/submissions/${id}`);
-            // setSubmission(response.data);
-            
-            // --- MOCK DATA Usage ---
-            // Simulate network delay
-            await new Promise(resolve => setTimeout(resolve, 500)); 
-            setSubmission(mockActivityData);
-            // --- END MOCK DATA ---
+            const response = await API.get(`/submissions/${id}`);
+            setSubmission(response.data);
 
         } catch (err) {
             console.error("Failed to fetch activity details:", err);
-            setError('Could not load activity details. Submission may not exist.');
+            const errorMessage = err.message === 'Network Error' 
+                ? 'Cannot connect to server. Check backend status (Naveen).'
+                : err.response?.data?.message || 'Could not load activity details.';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -113,12 +87,17 @@ const ActivityViewPage = () => {
         return new Date(dateString).toLocaleDateString();
     };
     
-    // Helper function to capitalize and space out snake_case or camelCase keys
+    // Helper function to capitalize and space out snake_case keys
     const formatLabel = (key) => {
         return key.replace(/_/g, ' ')
             .replace(/\b\w/g, c => c.toUpperCase())
             .replace('Field', '');
     };
+    
+    const submissionData = submission.data || {};
+    const proofs = submission.proofs || [];
+    const activityName = submission.templateName || (submission.templateId?.templateName) || 'Activity Submission'; 
+    const submittedDate = submission.createdAt || submission.submittedAt;
 
 
     return (
@@ -134,13 +113,13 @@ const ActivityViewPage = () => {
 
             <Grid container spacing={3}>
                 {/* --- HEADER & STATUS (Left Column) --- */}
-                <Grid item xs={12} md={8}>
+                <Grid item sx={{ width: { xs: '100%', md: '66.67%' } }}>
                     <CustomCard>
                         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 2 }}>
                             <Typography variant="h5" color="primary.main" fontWeight={700}>
-                                {submission.templateName}
+                                {activityName}
                             </Typography>
-                            <StatusBadge status={submission.status} />
+                            <StatusBadge status={submission.status || 'Unknown'} />
                         </Box>
                         
                         <Divider sx={{ my: 2 }} />
@@ -149,13 +128,13 @@ const ActivityViewPage = () => {
                             <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
                                 <WorkOutlineIcon sx={{ mr: 1 }} />
                                 <Typography variant="body1">
-                                    **Activity Title:** {submission.data.field_title}
+                                    **Activity Title:** {submissionData.field_title || 'N/A'}
                                 </Typography>
                             </Box>
                             <Box sx={{ display: 'flex', alignItems: 'center', color: 'text.secondary' }}>
                                 <CalendarMonthIcon sx={{ mr: 1 }} />
                                 <Typography variant="body2">
-                                    Submitted: {formatSubmissionDate(submission.submittedAt)}
+                                    Submitted: {submittedDate ? formatSubmissionDate(submittedDate) : 'N/A'}
                                 </Typography>
                             </Box>
                         </Box>
@@ -167,15 +146,15 @@ const ActivityViewPage = () => {
                             Submission Details
                         </Typography>
                         <Grid container spacing={2}>
-                            {Object.entries(submission.data).map(([key, value]) => (
-                                key !== 'field_title' && ( // Don't show the title again
+                            {Object.entries(submissionData).map(([key, value]) => (
+                                key !== 'field_title' && ( 
                                     <Grid item xs={12} sm={6} key={key}>
                                         <Box sx={{ bgcolor: '#f5f5f5', p: 1.5, borderRadius: '6px' }}>
                                             <Typography variant="caption" color="text.secondary">
                                                 {formatLabel(key)}:
                                             </Typography>
                                             <Typography variant="body1" fontWeight={500}>
-                                                {value}
+                                                {typeof value === 'object' && value !== null ? JSON.stringify(value) : value}
                                             </Typography>
                                         </Box>
                                     </Grid>
@@ -186,11 +165,11 @@ const ActivityViewPage = () => {
                 </Grid>
 
                 {/* --- PROOFS/ATTACHMENTS (Right Column) --- */}
-                <Grid item xs={12} md={4}>
+                <Grid item sx={{ width: { xs: '100%', md: '33.33%' } }}>
                     <CustomCard title="Attached Proofs" sx={{ height: '100%' }}>
                         <List>
-                            {submission.proofs.length > 0 ? (
-                                submission.proofs.map((proof, index) => (
+                            {proofs.length > 0 ? (
+                                proofs.map((proof, index) => (
                                     <ListItem 
                                         key={index} 
                                         disablePadding 
@@ -211,7 +190,7 @@ const ActivityViewPage = () => {
                                         </ListItemIcon>
                                         <ListItemText 
                                             primary={proof.filename} 
-                                            secondary={proof.fileType.split('/')[1]?.toUpperCase() || 'File'} 
+                                            secondary={proof.fileType?.split('/')[1]?.toUpperCase() || 'File'} 
                                         />
                                     </ListItem>
                                 ))
@@ -227,7 +206,7 @@ const ActivityViewPage = () => {
                                 variant="contained" 
                                 color="secondary" 
                                 sx={{ mt: 3 }}
-                                onClick={() => navigate(`/activity/edit/${submission.id}`)} // Placeholder edit route
+                                onClick={() => navigate(`/activity/edit/${submission._id}`)} 
                             >
                                 Edit Draft Submission
                             </Button>
