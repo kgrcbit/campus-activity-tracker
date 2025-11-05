@@ -109,7 +109,7 @@ router.get('/department/:dept/export', verifyToken, async (req, res) => {
       return false;
     });
 
-    // console.log(`Export: found ${activities.length} activities for department=${dept}`);
+    console.log(`Export: found ${activities.length} activities for department=${dept}`);
 
     if (format.toLowerCase() === 'csv') {
       // Generate CSV
@@ -226,10 +226,28 @@ router.get('/department/:dept/export', verifyToken, async (req, res) => {
 
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename=department_${dept}_report.pdf`);
-      const puppeteer = require('puppeteer');
+      
+async function getChromePath() {
+  const base = '/opt/render/project/.render-cache';
+  const chromeRoot = path.join(base, 'chrome');
+  if (fs.existsSync(chromeRoot)) {
+    const versions = fs.readdirSync(chromeRoot);
+    if (versions.length > 0) {
+      versions.sort();
+      const latest = versions[versions.length - 1];
+      const chromePath = path.join(chromeRoot, latest, 'chrome-linux64', 'chrome');
+      if (fs.existsSync(chromePath)) return chromePath;
+    }
+  }
+  return null;
+}
+
+const chromePath = await getChromePath();
+console.log('Resolved Chrome path:', chromePath);
 
 const browser = await puppeteer.launch({
   headless: true,
+  executablePath: chromePath || undefined,
   args: [
     '--no-sandbox',
     '--disable-setuid-sandbox',

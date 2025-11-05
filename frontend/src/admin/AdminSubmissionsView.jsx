@@ -73,7 +73,7 @@ const AdminSubmissionsView = () => {
 
             const response = await API.get(endpoint, { params: apiFilters });
             setSubmissions(response.data.data || response.data); 
-            // console.log('Loaded submissions:', response.data);
+            console.log('Loaded submissions:', response.data);
         } catch (error) {
             console.error("Failed to fetch submissions:", error.response ? error.response.data : error.message);
             alert('Failed to load submissions. Authentication or server error.');
@@ -114,7 +114,7 @@ const response = await axios.get(`${process.env.REACT_APP_API_URL}/templates`);
         });
 
         try {
-            // console.log(`Starting export for ${format} with filters:`, apiFilters);
+            console.log(`Starting export for ${format} with filters:`, apiFilters);
             let endpoint;
             if (filters.department) {
                 endpoint = `${process.env.REACT_APP_API_URL}/reports/department/${filters.department}/export`;
@@ -133,7 +133,7 @@ const response = await axios.get(`${process.env.REACT_APP_API_URL}/templates`);
                 }, 
                 responseType: 'blob' 
             });
-            // console.log(`Export ${format} response received:`, response);
+            console.log(`Export ${format} response received:`, response);
 
             const url = window.URL.createObjectURL(new Blob([response.data]));
             const link = document.createElement('a');
@@ -144,7 +144,7 @@ const response = await axios.get(`${process.env.REACT_APP_API_URL}/templates`);
             link.click();
             link.remove();
             window.URL.revokeObjectURL(url);
-            // console.log(`Export ${format} completed successfully.`);
+            console.log(`Export ${format} completed successfully.`);
 
         } catch (error) {
             console.error(`Failed to export ${format} report.`, error);
