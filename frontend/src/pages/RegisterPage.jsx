@@ -14,30 +14,50 @@ const DEPARTMENTS = [
   { value: 'IT', label: 'Information Technology' },
 ];
 
+// Mock Roles list
+const ROLES = [
+  { value: 'user', label: 'User' },
+  { value: 'admin', label: 'Admin' },
+];
+
 const RegisterPage = () => {
-  const { handleSubmit, control, setError, formState: { isSubmitting } } = useForm();
+  const { handleSubmit, control, setError, reset, formState: { isSubmitting } } = useForm();
   const navigate = useNavigate();
   const [successMessage, setSuccessMessage] = useState(null);
+
+  // Reset form state when component mounts
+  React.useEffect(() => {
+    reset();
+  }, [reset]);
 
   const onSubmit = async (data) => {
     setSuccessMessage(null);
     try {
-      // Calls Naveen's API: POST /auth/signup
+      // Clear any previous errors first
+      setError('apiError', null);
+
+      // Call signup API
       await API.post('/auth/signup', { 
         ...data,
-        // Role is often added server-side, but if required: role: 'user'
       }); 
-      console.log("hey this is smaple",data);
+
+      // Show success message and redirect
       setSuccessMessage('Registration successful! Redirecting to login...');
       setTimeout(() => {
         navigate('/login');
-      }, 2000); // Redirect after 2 seconds
+      }, 2000);
 
     } catch (error) {
       console.error('Registration Error:', error);
+      
+      const errorMessage = error.response?.data?.message || 
+        (error.message === 'Network Error' 
+          ? 'Cannot connect to the server. Please try again.' 
+          : 'Registration failed. Please check your details and try again.');
+
       setError('apiError', { 
         type: 'manual', 
-        message: error.response?.data?.message || 'Registration failed. Please try again.' 
+        message: errorMessage 
       });
     }
   };
@@ -136,6 +156,29 @@ const RegisterPage = () => {
                 helperText={error ? error.message : null}
               >
                 {DEPARTMENTS.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </StyledInput>
+            )}
+          />
+
+          {/* Role Select Input */}
+          <Controller
+            name="role"
+            control={control}
+            defaultValue={ROLES[0].value}
+            rules={{ required: 'Role is required' }}
+            render={({ field, fieldState: { error } }) => (
+              <StyledInput
+                {...field}
+                select
+                label="Role"
+                error={!!error}
+                helperText={error ? error.message : null}
+              >
+                {ROLES.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
                   </MenuItem>

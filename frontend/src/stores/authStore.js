@@ -15,13 +15,18 @@ API.interceptors.request.use((config) => {
   return config;
 });
 
-const useAuthStore = create((set) => ({
-  token: localStorage.getItem('token') || null, // Check storage on load
+const useAuthStore = create((set, get) => ({
+  token: localStorage.getItem('token') || null,
   user: JSON.parse(localStorage.getItem('user')) || null,
   isAuthenticated: !!localStorage.getItem('token'),
 
+  isAdmin: () => {
+    const user = get().user;
+    return user?.role === 'admin';
+  },
+
   login: (token, user) => {
-    localStorage.setItem('token', token); // cite: 2.1, 2.3
+    localStorage.setItem('token', token);
     localStorage.setItem('user', JSON.stringify(user));
     set({ token, user, isAuthenticated: true });
   },

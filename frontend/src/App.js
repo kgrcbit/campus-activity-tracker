@@ -5,7 +5,8 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ActivityViewPage from './pages/ActivityViewPage';
 import ActivityAddPage from './pages/ActivityAddPage';
-import PrivateRoute from './components/common/PrivateRoute'; 
+import PrivateRoute from './components/common/PrivateRoute';
+import PrivateAdminRoute from './components/common/PrivateAdminRoute';
 import AdminTemplateCRUD from './admin/AdminTemplateCRUD';
 import AdminSubmissionsView from './admin/AdminSubmissionsView';
 
@@ -19,11 +20,19 @@ const App = () => (
       
       {/* Protected Routes (Use PrivateRoute as the wrapper) */}
       <Route element={<PrivateRoute />}>
-        <Route path="/dashboard" element={<DashboardPage />} />           {/* cite: 10 */}
-        <Route path="/activity/view/:id" element={<ActivityViewPage />} /> {/* cite: 11 */}
-  {/* Admin routes */}
-  <Route path="/admin/templates" element={<AdminTemplateCRUD />} />
-  <Route path="/admin/reports" element={<AdminSubmissionsView />} />
+        <Route path="/dashboard" element={<DashboardPage />} />
+        <Route path="/activity/view/:id" element={<ActivityViewPage />} />
+        <Route path="/activity/add" element={<ActivityAddPage />} />
+      </Route>
+
+      {/* Admin Routes (Use PrivateAdminRoute for admin-only access) */}
+      <Route element={<PrivateRoute />}>
+        <Route path="/admin/*" element={<PrivateAdminRoute>
+          <Routes>
+            <Route path="templates" element={<AdminTemplateCRUD />} />
+            <Route path="reports" element={<AdminSubmissionsView />} />
+          </Routes>
+        </PrivateAdminRoute>} />
       </Route>
       {/* Add a route for Rahul's Activity Submission: /activity/add */}
       <Route path="/activity/add" element={<ActivityAddPage />} />

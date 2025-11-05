@@ -87,10 +87,10 @@ router.get('/department/:dept', verifyToken, async (req, res) => {
 // GET /api/reports/department/:dept/export
 router.get('/department/:dept/export', verifyToken, async (req, res) => {
   const { dept } = req.params;
-  const { format = 'pdf', dateFrom, dateTo } = req.query;
+  const { format = 'pdf', from, to } = req.query;
   
   try {
-    const dateRange = buildDateRange(dateFrom, dateTo);
+    const dateRange = buildDateRange(from, to);
     const query = {};
     if (dateRange) query.createdAt = dateRange;
 

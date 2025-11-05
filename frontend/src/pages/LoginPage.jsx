@@ -8,16 +8,21 @@ import VpnKeyIcon from '@mui/icons-material/VpnKey';
 
 const LoginPage = () => {
   // We explicitly use the necessary RHF hooks
-  const { handleSubmit, control, setError, formState: { isSubmitting, errors } } = useForm();
+  const { handleSubmit, control, setError, reset, formState: { isSubmitting, errors } } = useForm();
   const { login } = useAuthStore();
   const navigate = useNavigate();
 
+  // Reset form state when component mounts
+  React.useEffect(() => {
+    reset();
+  }, [reset]);
+
   const onSubmit = async (data) => {
-    // Clear any previous API errors
-    setError('apiError', null);
-    
     try {
-      // 1. Call Naveen's API: POST /auth/login 
+      // Clear any previous API errors and set submitting state
+      setError('apiError', null);
+      
+      // 1. Call login API
       const response = await API.post('/auth/login', data); 
       
       const { token, user } = response.data;
@@ -25,17 +30,16 @@ const LoginPage = () => {
       // 2. Store JWT token and user details in state/localStorage 
       login(token, user); 
       
-      // 3. Redirect to the protected dashboard route [cite: 10]
+      // 3. Redirect to the protected dashboard route
       navigate('/dashboard'); 
 
     } catch (error) {
-      // 4. Handle login failure (e.g., 401 Unauthorized from backend)
       console.error('Login Error:', error);
       
       const errorMessage = 
         error.response?.data?.message || 
         (error.message === 'Network Error' 
-          ? 'Cannot connect to the backend server. Please ensure Naveen\'s API is running.' 
+          ? 'Cannot connect to the backend server. Please ensure the server is running.' 
           : 'Login failed. Invalid email or password.');
 
       setError('apiError', { 

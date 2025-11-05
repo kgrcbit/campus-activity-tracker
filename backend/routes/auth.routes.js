@@ -8,7 +8,7 @@ const jwt = require('jsonwebtoken'); // <-- ADD THIS IMPORT AT THE TOP
 router.post('/signup', async (req, res) => {
   try {
     // 1. Get user data from request body
-    const { name, email, password, department } = req.body;
+    const { name, email, password, department, role } = req.body;
 console.log(req.body);
 
     // 2. Check if user already exists
@@ -27,6 +27,7 @@ console.log(req.body);
       email,
       password: hashedPassword,
       department,
+      role,
     });
 
     // 5. Save user to database
@@ -69,7 +70,7 @@ router.post('/login', async (req, res) => {
       { expiresIn: '3h' }, // Token expires in 3 hours
       (err, token) => {
         if (err) throw err;
-        res.json({ token, user: { id: user.id, name: user.name, email: user.email, department: user.department } });
+        res.json({ token, user: { id: user.id, name: user.name, email: user.email, department: user.department, role: user.role } });
       }
     );
 

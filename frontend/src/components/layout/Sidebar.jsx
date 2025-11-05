@@ -10,19 +10,18 @@ import useAuthStore from '../../stores/authStore';
 const drawerWidth = 240;
 
 const Sidebar = () => {
-  const { } = useAuthStore();
+  const authStore = useAuthStore();
   const location = useLocation();
 
   const navItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' }, // cite: 10
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
     { text: 'Submit Activity', icon: <AddCircleIcon />, path: '/activity/add' },
-    // Placeholder Admin Routes
-    { text: 'Manage Templates', icon: <AdminPanelSettingsIcon />, path: '/admin/templates', admin: true }, // cite: 12
-    { text: 'View Reports', icon: <ReportIcon />, path: '/admin/reports', admin: true }, // cite: 13
+    { text: 'Manage Templates', icon: <AdminPanelSettingsIcon />, path: '/admin/templates', admin: true },
+    { text: 'View Reports', icon: <ReportIcon />, path: '/admin/reports', admin: true },
   ];
 
-  // Simple logic to show admin links (You can refine this using user roles from the authStore)
-  const isAdmin = true; // Temporary flag for development visibility
+  // Use the isAdmin check from auth store
+  const isAdmin = authStore.isAdmin();
 
   return (
     <Drawer

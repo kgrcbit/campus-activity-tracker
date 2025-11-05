@@ -44,14 +44,35 @@ const AdminSubmissionsView = () => {
         setIsLoading(true);
         const apiFilters = { ...filters };
         if (apiFilters.status === 'All') { delete apiFilters.status; }
+        
+        // Transform date range filters to match backend expectations
+        if (apiFilters.dateRangeFrom) {
+            apiFilters.from = apiFilters.dateRangeFrom;
+            delete apiFilters.dateRangeFrom;
+        }
+        if (apiFilters.dateRangeTo) {
+            apiFilters.to = apiFilters.dateRangeTo;
+            delete apiFilters.dateRangeTo;
+        }
+
+        // Remove empty filters
         Object.keys(apiFilters).forEach(key => {
             if (!apiFilters[key]) delete apiFilters[key];
         });
 
         try {
-            const response = await API.get('http://localhost:5000/api/submissions', { params: apiFilters });
-            setSubmissions(response.data); 
-            console.log(response.data);
+            const endpoint = apiFilters.department 
+                ? `http://localhost:5000/api/reports/department/${apiFilters.department}`
+                : 'http://localhost:5000/api/submissions';
+            
+            // Remove department from query params since it's in the URL for department endpoint
+            if (apiFilters.department) {
+                delete apiFilters.department;
+            }
+
+            const response = await API.get(endpoint, { params: apiFilters });
+            setSubmissions(response.data.data || response.data); 
+            console.log('Loaded submissions:', response.data);
         } catch (error) {
             console.error("Failed to fetch submissions:", error.response ? error.response.data : error.message);
             alert('Failed to load submissions. Authentication or server error.');
@@ -76,12 +97,23 @@ const response = await axios.get('http://localhost:5000/api/templates');
         setIsExporting(true);
         const apiFilters = { ...filters }; 
         if (apiFilters.status === 'All') delete apiFilters.status;
+        
+        // Transform date range filters to match backend expectations
+        if (apiFilters.dateRangeFrom) {
+            apiFilters.from = apiFilters.dateRangeFrom;
+            delete apiFilters.dateRangeFrom;
+        }
+        if (apiFilters.dateRangeTo) {
+            apiFilters.to = apiFilters.dateRangeTo;
+            delete apiFilters.dateRangeTo;
+        }
+
         Object.keys(apiFilters).forEach(key => {
             if (!apiFilters[key]) delete apiFilters[key];
         });
 
         try {
-            console.log(`Starting export for ${format} with filters:`, filters);
+            console.log(`Starting export for ${format} with filters:`, apiFilters);
             let endpoint;
             if (filters.department) {
                 endpoint = `http://localhost:5000/api/reports/department/${filters.department}/export`;
@@ -95,8 +127,8 @@ const response = await axios.get('http://localhost:5000/api/templates');
                 params: { 
                     ...apiFilters,
                     format: format.toLowerCase(),
-                    dateFrom: filters.dateRangeFrom,
-                    dateTo: filters.dateRangeTo
+                    from: apiFilters.from,
+                    to: apiFilters.to
                 }, 
                 responseType: 'blob' 
             });
@@ -445,7 +477,7 @@ const response = await axios.get('http://localhost:5000/api/templates');
                         ))}
                     </select>
 
-                    <select
+                    {/* <select
                         value={filters.status}
                         onChange={(e) => setFilters(p => ({...p, status: e.target.value}))}
                     >
@@ -454,7 +486,7 @@ const response = await axios.get('http://localhost:5000/api/templates');
                         <option value="Verified by Faculty">Verified by Faculty</option>
                         <option value="Approved">Approved</option>
                         <option value="Rejected">Rejected</option>
-                    </select>
+                    </select> */}
 
                     <select
                         value={filters.templateId}
