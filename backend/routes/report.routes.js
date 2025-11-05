@@ -226,8 +226,12 @@ router.get('/department/:dept/export', verifyToken, async (req, res) => {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename=department_${dept}_report.pdf`);
       
-      const puppeteer = require('puppeteer');
-      const browser = await puppeteer.launch({ headless: 'new' });
+      const puppeteer = require('puppeteer-core');
+      const browser = await puppeteer.launch({
+        executablePath: process.env.PUPPETEER_EXECUTABLE_PATH || '/usr/bin/chromium-browser',
+        headless: true,
+        args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage', '--disable-accelerated-2d-canvas', '--no-first-run', '--no-zygote', '--single-process', '--disable-gpu']
+      });
       const page = await browser.newPage();
       await page.setContent(html);
       const pdf = await page.pdf({ format: 'A4' });

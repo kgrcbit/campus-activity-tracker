@@ -22,7 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
     "multer": "^2.0.2",
-    "puppeteer": "^24.28.0",
+    "puppeteer-core": "^24.29.0",
     "streamifier": "^0.1.1"
   }
 }
