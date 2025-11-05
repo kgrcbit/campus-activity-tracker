@@ -227,85 +227,20 @@ router.get('/department/:dept/export', verifyToken, async (req, res) => {
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader('Content-Disposition', `attachment; filename=department_${dept}_report.pdf`);
       const puppeteer = require('puppeteer');
-async function resolveChromeExecutable() {
-  // 1) explicit env override (preferred)
-  if (process.env.PUPPETEER_EXECUTABLE_PATH) {
-    const p = process.env.PUPPETEER_EXECUTABLE_PATH;
-    if (fs.existsSync(p)) return p;
-    console.warn('PUPPETEER_EXECUTABLE_PATH set but file not found:', p);
-  }
 
-  // 2) If Render: attempt to discover the Puppeteer cache chrome install
-  // Render commonly uses /opt/render/.cache/puppeteer/<browser>/...
-  const renderCacheBase = process.env.PUPPETEER_CACHE_DIR || '/opt/render/.cache/puppeteer';
-  try {
-    const chromeRoot = path.join(renderCacheBase, 'chrome');
-    if (fs.existsSync(chromeRoot)) {
-      // look for versioned folders inside chrome root and pick the latest
-      const versions = fs.readdirSync(chromeRoot).filter(Boolean);
-      if (versions.length) {
-        // choose the last-sorted folder (often newest) then the chrome binary inside
-        versions.sort();
-        const chosen = versions[versions.length - 1];
-        // typical path used by Puppeteer: .../<version>/chrome-linux64/chrome
-        const candidate = path.join(chromeRoot, chosen, 'chrome-linux64', 'chrome');
-        if (fs.existsSync(candidate)) return candidate;
-        // alternative layout: sometimes binary is directly at chromeRoot/<version>/chrome
-        const alt = path.join(chromeRoot, chosen, 'chrome');
-        if (fs.existsSync(alt)) return alt;
-      }
-    }
-  } catch (e) {
-    console.warn('Error while probing Render cache for chrome:', e.message);
-  }
-
-  // 3) Some renders put the binary at a known path; test the common Render path
-  const commonRender = '/opt/render/.cache/puppeteer/chrome/chrome-linux64/chrome';
-  if (fs.existsSync(commonRender)) return commonRender;
-
-  // 4) fallback: return null and let puppeteer attempt to find local chrome
-  return null;
-}
-
-// In your export PDF handler, when ready to create the browser:
-const chromeExecutable = await resolveChromeExecutable();
-console.log('Resolved chrome executable:', chromeExecutable);
-
-let browser;
-if (chromeExecutable) {
-  try {
-    browser = await puppeteer.launch({
-      headless: true,
-      executablePath: chromeExecutable,
-      args: [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--single-process',
-        '--disable-gpu'
-      ]
-    });
-  } catch (err) {
-    console.error('Failed launching puppeteer with executablePath:', chromeExecutable, err);
-    // fall through to default launch attempt
-  }
-}
-
-if (!browser) {
-  // Try a default launch (puppeteer may use its bundled browser)
-  try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-  } catch (err) {
-    console.error('Default puppeteer.launch failed:', err);
-    throw err; // allow outer try/catch to return 500 with informative log
-  }
-}
+const browser = await puppeteer.launch({
+  headless: true,
+  args: [
+    '--no-sandbox',
+    '--disable-setuid-sandbox',
+    '--disable-dev-shm-usage',
+    '--disable-accelerated-2d-canvas',
+    '--no-first-run',
+    '--no-zygote',
+    '--single-process',
+    '--disable-gpu'
+  ]
+});
 
 const page = await browser.newPage();
 await page.setContent(html, { waitUntil: 'networkidle0' });
