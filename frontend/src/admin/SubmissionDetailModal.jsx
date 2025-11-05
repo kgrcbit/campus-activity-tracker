@@ -78,7 +78,7 @@ const SubmissionDetailModal = ({ submissionId, onClose, onUpdate }) => {
         setError('');
         try {
             // API call to update the status
-            await axios.put(`http://localhost:5000/api/submissions/${submissionId}/status`, {
+            await axios.put(`${process.env.REACT_APP_API_URL}/submissions/${submissionId}/status`, {
                 newStatus: newStatus,
                 // Optionally include remarks if the backend supports it
                 ...(newStatus === 'Rejected' && { remarks: rejectionReason })

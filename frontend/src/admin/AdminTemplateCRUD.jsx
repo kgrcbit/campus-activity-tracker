@@ -115,7 +115,7 @@ const AdminTemplateCRUD = () => {
         setIsLoading(true); // Show loading indicator in table
         try {
             // ACTUAL API CALL to your backend endpoint
-            const response = await axios.get('http://localhost:5000/api/templates');
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/templates`);
             // Update the state with fetched data
             setTemplates(response.data);
         } catch (error) {

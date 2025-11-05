@@ -62,8 +62,9 @@ const AdminSubmissionsView = () => {
 
         try {
             const endpoint = apiFilters.department 
-                ? `http://localhost:5000/api/reports/department/${apiFilters.department}`
-                : 'http://localhost:5000/api/submissions';
+   ? `${process.env.REACT_APP_API_URL}/reports/department/${apiFilters.department}`
+: `${process.env.REACT_APP_API_URL}/submissions`;
+
             
             // Remove department from query params since it's in the URL for department endpoint
             if (apiFilters.department) {
@@ -86,7 +87,7 @@ const AdminSubmissionsView = () => {
     };
     const fetchTemplateOptions = async () => {
         try {
-const response = await axios.get('http://localhost:5000/api/templates');
+const response = await axios.get(`${process.env.REACT_APP_API_URL}/templates`);
             setTemplateOptions(response.data.map(t => ({ id: t._id, name: t.templateName })));
         } catch (error) {
             console.error("Failed to fetch template options:", error);
@@ -116,7 +117,7 @@ const response = await axios.get('http://localhost:5000/api/templates');
             // console.log(`Starting export for ${format} with filters:`, apiFilters);
             let endpoint;
             if (filters.department) {
-                endpoint = `http://localhost:5000/api/reports/department/${filters.department}/export`;
+                endpoint = `${process.env.REACT_APP_API_URL}/reports/department/${filters.department}/export`;
             } else {
                 alert('Please select a department to export.');
                 setIsExporting(false);
