@@ -6,6 +6,7 @@ const { authenticateJWT: verifyToken } = require('../middleware/auth.middleware.
 const dayjs = require('dayjs');
 const fs = require('fs');
 const path = require('path');
+const puppeteer = require('puppeteer'); // 👈 ADD THIS LINE
 // Helper to build date filter
 function buildDateRange(from, to) {
   if (!from && !to) return null;
