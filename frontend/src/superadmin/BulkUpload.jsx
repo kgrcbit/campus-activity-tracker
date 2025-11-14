@@ -7,6 +7,7 @@ const BulkUpload = () => {
     const [selectedFile, setSelectedFile] = useState(null);
     const [isUploading, setIsUploading] = useState(false);
     const [results, setResults] = useState(null);
+    const [selectedTemplate, setSelectedTemplate] = useState("");
 
     const handleFileSelect = (e) => {
         const file = e.target.files[0];
@@ -40,6 +41,37 @@ const BulkUpload = () => {
             setIsUploading(false);
         }
     };
+    const downloadTemplate = () => {
+    if (!selectedTemplate) {
+        alert("Please select a template first!");
+        return;
+    }
+
+    let csvContent = "";
+
+    if (selectedTemplate === "students") {
+        csvContent =
+            "name,email,rollNo,department,section,year,role\n" +
+            "Rahul Arra,rahul@example.com,210003,IT,A,3,student\n";
+    }
+
+    if (selectedTemplate === "teachers") {
+        csvContent =
+            "name,email,teacherId,department,classTeacher,role\n" +
+            "Laxman Rao,laxman@example.com,T001,IT,true,teacher\n";
+    }
+
+    // Convert to Blob and Download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = window.URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `${selectedTemplate}_template.csv`;
+    link.click();
+
+    window.URL.revokeObjectURL(url);
+};
 
     return (
         <div className="bulk-upload-container">
@@ -273,6 +305,46 @@ const BulkUpload = () => {
                 </h1>
                 <p className="header-subtitle">Upload CSV files to bulk import students or teachers.</p>
             </header>
+<div className="template-select-wrapper" style={{ marginBottom: "20px" }}>
+    <label style={{ fontWeight: "600", marginBottom: "8px", display: "block" }}>
+        Select Upload Template
+    </label>
+    <select
+        value={selectedTemplate}
+        onChange={(e) => setSelectedTemplate(e.target.value)}
+        className="template-select"
+        style={{
+            padding: "12px",
+            borderRadius: "8px",
+            border: "1px solid #d1d5db",
+            width: "100%",
+            background: "white"
+        }}
+    >
+        <option value="">-- Choose Template --</option>
+        <option value="students">Students Template</option>
+        <option value="teachers">Teachers Template</option>
+        
+        {/* You can dynamically load more templates later */}
+    </select>
+    <button
+    onClick={downloadTemplate}
+    className="btn-export-template"
+    style={{
+        marginTop: "10px",
+        padding: "10px 20px",
+        borderRadius: "8px",
+        backgroundColor: "#3b82f6",
+        color: "white",
+        fontWeight: "500",
+        border: "none",
+        cursor: "pointer"
+    }}
+>
+    Download Template CSV
+</button>
+
+</div>
 
             <div className="upload-card">
                 <h2 className="upload-title">

@@ -15,6 +15,7 @@ import Departments from './superadmin/Departments';
 import BulkUpload from './superadmin/BulkUpload';
 import Students from './superadmin/Students';
 import Teachers from './superadmin/Teachers';
+import SuperAdminReports from './superadmin/SuperAdminReports';
 
 const App = () => (
   <Router>
@@ -47,6 +48,8 @@ const App = () => (
         <Route path="/superadmin/bulk-upload" element={<BulkUpload />} />
         <Route path="/superadmin/students" element={<Students />} />
         <Route path="/superadmin/teachers" element={<Teachers />} />
+        <Route path="/superadmin/reports" element={<SuperAdminReports />} />
+        <Route path="/admin/templates" element={<AdminTemplateCRUD />} />
       </Route>
     </Routes>
   </Router>

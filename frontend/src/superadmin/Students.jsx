@@ -9,7 +9,7 @@ const Students = () => {
         department: '',
         year: '',
         section: '',
-        search: ''
+        search: '',
     });
     const [isLoading, setIsLoading] = useState(false);
     const [currentPage, setCurrentPage] = useState(1);
@@ -336,6 +336,7 @@ const Students = () => {
                         placeholder="Search by name or roll number"
                         value={filters.search}
                         onChange={(e) => setFilters(p => ({...p, search: e.target.value}))}
+                        
                     />
                 </div>
 

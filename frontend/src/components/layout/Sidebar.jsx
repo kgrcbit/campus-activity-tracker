@@ -8,6 +8,7 @@ import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 import UploadIcon from '@mui/icons-material/CloudUpload';
 import PeopleIcon from '@mui/icons-material/People';
 import SchoolIcon from '@mui/icons-material/School';
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 
@@ -24,8 +25,11 @@ const Sidebar = () => {
     { text: 'View Reports', icon: <ReportIcon />, path: '/admin/reports', admin: true },
     { text: 'Departments', icon: <SupervisorAccountIcon />, path: '/superadmin/departments', superadmin: true },
     { text: 'Bulk Upload', icon: <UploadIcon />, path: '/superadmin/bulk-upload', superadmin: true },
+    { text: 'Manage Templates', icon: <AdminPanelSettingsIcon />, path: '/admin/templates', superadmin: true },
+
     { text: 'Students', icon: <PeopleIcon />, path: '/superadmin/students', superadmin: true },
     { text: 'Teachers', icon: <SchoolIcon />, path: '/superadmin/teachers', superadmin: true },
+    { text: 'View Reports', icon: <AssessmentIcon />, path: '/superadmin/reports', superadmin: true },
   ];
 
   // Use the isAdmin and isSuperAdmin checks from auth store
