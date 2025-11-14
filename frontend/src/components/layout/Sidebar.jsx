@@ -9,6 +9,7 @@ import UploadIcon from '@mui/icons-material/CloudUpload';
 import PeopleIcon from '@mui/icons-material/People';
 import SchoolIcon from '@mui/icons-material/School';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import ClassIcon from '@mui/icons-material/Class';
 import { Link as RouterLink, useLocation } from 'react-router-dom';
 import useAuthStore from '../../stores/authStore';
 
@@ -30,11 +31,13 @@ const Sidebar = () => {
     { text: 'Students', icon: <PeopleIcon />, path: '/superadmin/students', superadmin: true },
     { text: 'Teachers', icon: <SchoolIcon />, path: '/superadmin/teachers', superadmin: true },
     { text: 'View Reports', icon: <AssessmentIcon />, path: '/superadmin/reports', superadmin: true },
+    { text: 'Student Submissions', icon: <ClassIcon />, path: '/teacher/dashboard', teacher: true },
   ];
 
   // Use the isAdmin and isSuperAdmin checks from auth store
   const isAdmin = authStore.isAdmin();
   const isSuperAdmin = authStore.isSuperAdmin();
+  const isTeacher = authStore.user?.role === 'teacher';
 
   return (
     <Drawer
@@ -52,7 +55,7 @@ const Sidebar = () => {
       </Toolbar>
       <Box sx={{ overflow: 'auto' }}>
         <List>
-          {navItems.filter(item => (!item.admin || isAdmin) && (!item.superadmin || isSuperAdmin)).map((item) => (
+          {navItems.filter(item => (!item.admin || isAdmin) && (!item.superadmin || isSuperAdmin) && (!item.teacher || isTeacher)).map((item) => (
             <ListItem key={item.text} disablePadding sx={{ py: 0.5 }}>
               <ListItemButton 
                 component={RouterLink} 

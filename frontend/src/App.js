@@ -16,6 +16,7 @@ import BulkUpload from './superadmin/BulkUpload';
 import Students from './superadmin/Students';
 import Teachers from './superadmin/Teachers';
 import SuperAdminReports from './superadmin/SuperAdminReports';
+import TeacherDashboard from './teacher/TeacherDashboard';
 
 const App = () => (
   <Router>
@@ -50,6 +51,11 @@ const App = () => (
         <Route path="/superadmin/teachers" element={<Teachers />} />
         <Route path="/superadmin/reports" element={<SuperAdminReports />} />
         <Route path="/admin/templates" element={<AdminTemplateCRUD />} />
+      </Route>
+
+      {/* Teacher Routes */}
+      <Route element={<PrivateRoute />}>
+        <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
       </Route>
     </Routes>
   </Router>
