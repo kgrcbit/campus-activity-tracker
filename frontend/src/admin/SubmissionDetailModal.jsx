@@ -214,6 +214,8 @@ const SubmissionDetailModal = ({ submissionId, onClose, onUpdate }) => {
                                     <DetailItem label="Submission ID" value={submission._id?.slice(-8) || 'N/A'} />
                                     <DetailItem label="Student Name" value={submission.userId?.name || 'Unknown'} />
                                     <DetailItem label="Department" value={submission.userId?.department || 'N/A'} />
+                                    <DetailItem label="Year" value={submission.userId?.assignedYear || 'N/A'} />
+                                    <DetailItem label="Section" value={submission.userId?.assignedSection || 'N/A'} />
                                     <DetailItem label="Activity Type" value={submission.templateId?.templateName?.replace(/_/g, ' ') || 'N/A'} />
                                     <DetailItem label="Submitted On" value={new Date(submission.createdAt).toLocaleString()} />
                                 </div>
