@@ -49,7 +49,7 @@ const userSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['superadmin', 'deptadmin', 'teacher', 'student'],
+    enum: ['superadmin', 'deptadmin', 'teacher', 'student', 'user'],
     default: 'student',
   },
   isVerified: {

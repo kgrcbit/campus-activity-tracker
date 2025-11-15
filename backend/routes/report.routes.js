@@ -180,17 +180,31 @@ router.get('/activity/:templateId', verifyToken, async (req, res) => {
 
 router.get('/department/:dept', verifyToken, async (req, res) => {
   const { dept } = req.params;
-  const { from, to, page = 1, limit = 50, year, section } = req.query;
+  const { from, to, page = 1, limit = 50, year, section, studentName } = req.query;
   try {
     const dateRange = buildDateRange(from, to);
-    const userQuery = { department: new RegExp(`^${dept}$`, 'i') };
+    const userQuery = { role: { $in: ['student', 'user'] } };
+    if (dept && dept !== 'all') userQuery.department = new RegExp(`^${dept}$`, 'i');
     if (year) userQuery.year = year;
     if (section) userQuery.section = { $in: section.split(',') };
+    if (studentName) {
+      userQuery.$or = [
+        { name: new RegExp(studentName, 'i') },
+        { rollNo: new RegExp(studentName, 'i') }
+      ];
+    }
     const usersInDept = await User.find(userQuery).select('_id').lean();
     const userIds = usersInDept.map(u => u._id);
-    const query = {
-      $or: [{ userId: { $in: userIds } }, { department: new RegExp(`^${dept}$`, 'i') }]
-    };
+    let query;
+    if (studentName || year || section) {
+      // When filtering by student name, year, or section, only show activities from matching users
+      query = { userId: { $in: userIds } };
+    } else {
+      // When no specific user filters, include activities that have department set
+      query = {
+        $or: [{ userId: { $in: userIds } }, { department: new RegExp(`^${dept}$`, 'i') }]
+      };
+    }
     if (dateRange) query.createdAt = dateRange;
     const docs = await Activity.find(query).sort({ createdAt: -1 }).skip((page - 1) * limit).limit(parseInt(limit)).populate('userId', 'name department rollNo year section').lean();
     const total = await Activity.countDocuments(query);
@@ -205,19 +219,33 @@ router.get('/department/:dept', verifyToken, async (req, res) => {
 // --- EXPORT ROUTE ---
 router.get('/department/:dept/export', verifyToken, async (req, res) => {
   const { dept } = req.params;
-  const { format = 'pdf', from, to, year, section } = req.query;
+  const { format = 'pdf', from, to, year, section, studentName } = req.query;
 
   try {
     // 1. Get Data
     const dateRange = buildDateRange(from, to);
-    const userQuery = { department: new RegExp(`^${dept}$`, 'i') };
+    const userQuery = { role: { $in: ['student', 'user'] } };
+    if (dept && dept !== 'all') userQuery.department = new RegExp(`^${dept}$`, 'i');
     if (year) userQuery.year = year;
     if (section) userQuery.section = { $in: section.split(',') };
+    if (studentName) {
+      userQuery.$or = [
+        { name: new RegExp(studentName, 'i') },
+        { rollNo: new RegExp(studentName, 'i') }
+      ];
+    }
     const usersInDept = await User.find(userQuery).select('_id').lean();
     const userIds = usersInDept.map(u => u._id);
-    const query = {
-      $or: [{ userId: { $in: userIds } }, { department: new RegExp(`^${dept}$`, 'i') }]
-    };
+    let query;
+    if (studentName || year || section) {
+      // When filtering by student name, year, or section, only show activities from matching users
+      query = { userId: { $in: userIds } };
+    } else {
+      // When no specific user filters, include activities that have department set
+      query = {
+        $or: [{ userId: { $in: userIds } }, { department: new RegExp(`^${dept}$`, 'i') }]
+      };
+    }
     if (dateRange) query.createdAt = dateRange;
 
     let activities = await Activity.find(query)
