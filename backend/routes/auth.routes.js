@@ -42,13 +42,18 @@ console.log(req.body);
 });
 router.post('/login', async (req, res) => {
   try {
-    // 1. Get email and password from request body
-    const { email, password } = req.body;
+    // 1. Get loginId and password from request body
+    const { loginId, password } = req.body;
 
-    // 2. Check if user exists
-    const user = await User.findOne({ email });
+    // 2. Check if user exists by rollNo or teacherId
+    const user = await User.findOne({
+      $or: [
+        { rollNo: loginId },
+        { teacherId: loginId }
+      ]
+    });
     if (!user) {
-      return res.status(400).json({ message: 'Invalid credentials (email)' });
+      return res.status(400).json({ message: 'Invalid credentials (login ID)' });
     }
 
     // 3. Check if password is correct

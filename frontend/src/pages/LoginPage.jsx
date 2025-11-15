@@ -65,22 +65,21 @@ const LoginPage = () => {
 
         <Box component="form" onSubmit={handleSubmit(onSubmit)} noValidate sx={{ mt: 1 }}>
           <Controller
-            name="email"
+            name="loginId"
             control={control}
             defaultValue=""
             rules={{
-              required: 'Email is required',
-              pattern: { value: /^\S+@\S+$/i, message: 'Invalid email format' },
+              required: 'Login ID is required',
             }}
             render={({ field, fieldState }) => (
               <StyledInput
                 {...field}
                 onChange={handleInputChange(field.onChange)} // <-- APPLIED FIX
-                label="Email Address"
-                type="email"
+                label="Login ID (Roll No for Students, Teacher ID for Teachers)"
+                type="text"
                 error={!!fieldState.error}
                 helperText={fieldState.error?.message}
-                autoComplete="email"
+                autoComplete="username"
                 autoFocus
               />
             )}
